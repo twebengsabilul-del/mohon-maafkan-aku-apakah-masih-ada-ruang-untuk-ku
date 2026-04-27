@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lara & Karsa | Sebuah Elegi Sahabat</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Outfit:wght@200;300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- LIBRARIES UNTUK ANIMASI SUPER SMOOTH -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/split-type"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Outfit"', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: '#030305',
+                        darker: '#010101',
+                        accent: '#FF5A1F',
+                        surface: 'rgba(255, 255, 255, 0.03)',
+                    },
+                    keyframes: {
+                        floatUp: {
+                            '0%': { transform: 'translateY(0) scale(1)', opacity: '0' },
+                            '20%': { opacity: '1' },
+                            '100%': { transform: 'translateY(-150px) scale(0.5)', opacity: '0' },
+                        }
+                    },
+                    animation: {
+                        'float-up-1': 'floatUp 4s ease-in infinite',
+                        'float-up-2': 'floatUp 5s ease-in infinite 1s',
+                        'float-up-3': 'floatUp 6s ease-in infinite 2s',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* --- Reset & Base --- */
+        body { background-color: #030305; color: #e5e7eb; overflow-x: hidden; cursor: none; }
+        ::selection { background: #FF5A1F; color: #000; }
+
+        /* Lenis smooth scroll */
+        html.lenis, html.lenis body { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto !important; }
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+        .lenis.lenis-stopped { overflow: hidden; }
+        ::-webkit-scrollbar { display: none; }
+
+        /* --- Custom Cursor --- */
+        #cursor-dot { position: fixed; top: 0; left: 0; width: 6px; height: 6px; background-color: #FF5A1F; border-radius: 50%; pointer-events: none; z-index: 9999; }
+        #cursor-ring { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; pointer-events: none; z-index: 9998; }
+
+        /* --- Effects --- */
+        .cinematic-grain { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 50; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
+        .vignette { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, transparent 30%, #010101 120%); pointer-events: none; z-index: 40; }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; opacity: 0.6; }
+
+        /* --- Advanced Loader (Scramble Text) --- */
+        #loader { position: fixed; inset: 0; background: #010101; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .loader-perc { font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 200; color: #FF5A1F; letter-spacing: -0.05em; margin-bottom: 1rem; }
+        .loader-text-wrap { font-family: 'Outfit', sans-serif; font-size: 0.75rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+
+        /* --- Text Split CSS (Important for GSAP SplitType) --- */
+        .word { overflow: hidden; padding-bottom: 0.1em; margin-bottom: -0.1em; transform-origin: bottom; }
+        .char { display: inline-block; transform-origin: bottom center; }
+
+        /* --- Other Animations & Classes --- */
+        .mask-wrapper { overflow: hidden; display: inline-block; vertical-align: top; }
+        .mask-up { display: inline-block; transform: translateY(120%); opacity: 0; }
+        .fade-scale { opacity: 0; transform: scale(0.95) translateY(30px); }
+        .glass-panel { background: rgba(255, 255, 255, 0.015); border: 1px solid rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); }
+        .nav-progress { position: fixed; top: 0; left: 0; height: 2px; background: #FF5A1F; z-index: 100; transform-origin: left; transform: scaleX(0); }
+
+        /* Music Resonance Animation */
+        @keyframes rippleOut {
+            0% { transform: scale(0.5); opacity: 1; border-color: rgba(255, 90, 31, 0.8); }
+            100% { transform: scale(2.5); opacity: 0; border-color: rgba(255, 90, 31, 0); }
+        }
+        .music-playing .music-ripple-1 { animation: rippleOut 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) infinite; }
+        .music-playing .music-ripple-2 { animation: rippleOut 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) infinite 1.25s; }
+        .music-playing .music-core { background-color: #FF5A1F; box-shadow: 0 0 15px rgba(255, 90, 31, 0.8); transform: scale(1.2); }
+
+        /* 3D Global Helpers */
+        .perspective-container { perspective: 1000px; transform-style: preserve-3d; }
+        .preserve-3d { transform-style: preserve-3d; }
+        
+        /* Pigment & Sand Particles */
+        .pigment { position: absolute; border-radius: 50%; pointer-events: none; z-index: 25; }
+
+        /* Archway CSS */
+        .arch-layer { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; transform-style: preserve-3d; }
+
+        /* Orbital Spark Animation (Ultra-Premium Icon) */
+        .abstract-spark { transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .abstract-ring { transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .group:hover .abstract-spark { transform: rotate(90deg) scale(0.7); }
+        .group:hover .abstract-ring { transform: scale(1.5) rotate(180deg); opacity: 0; border-color: transparent; }
+        
+        @keyframes pulseWave {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+        .group:hover .abstract-pulse { animation: pulseWave 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) infinite; }
+
+        /* Form Input */
+        .input-group { position: relative; margin-bottom: 2rem; }
+        .input-group textarea { width: 100%; padding: 10px 0; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2); color: white; font-family: 'Outfit', sans-serif; font-size: 1rem; resize: none; transition: border-color 0.3s; }
+        .input-group textarea:focus { outline: none; border-bottom-color: #FF5A1F; }
+        .input-group label { position: absolute; top: 10px; left: 0; color: rgba(255,255,255,0.4); pointer-events: none; transition: 0.3s ease all; font-family: 'Outfit', sans-serif; font-size: 0.9rem; }
+        .input-group textarea:focus ~ label, .input-group textarea:not(:placeholder-shown) ~ label { top: -20px; font-size: 0.75rem; color: #FF5A1F; letter-spacing: 0.1em; text-transform: uppercase; }
+        
+        /* Scroll Droplet Animation (Smooth) */
+        .scroll-drop-anim { animation: scrollDrop 3.5s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+        @keyframes scrollDrop { 
+            0% { transform: translateY(-100%); opacity: 0; } 
+            50% { transform: translateY(0%); opacity: 1; } 
+            100% { transform: translateY(100%); opacity: 0; } 
+        }
+
+        /* --- NEW PREMIUM BACKGROUND EFFECTS --- */
+        .ambient-blob { position: absolute; filter: blur(120px); border-radius: 50%; animation: floatBlob 20s infinite alternate ease-in-out; mix-blend-mode: screen; opacity: 0.5; pointer-events: none; }
+        .blob-1 { top: -20%; left: -10%; width: 50vw; height: 50vw; background: rgba(255, 90, 31, 0.4); animation-delay: 0s; }
+        .blob-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: rgba(150, 30, 0, 0.5); animation-delay: -5s; }
+        .blob-3 { top: 30%; left: 40%; width: 40vw; height: 40vw; background: rgba(255, 255, 255, 0.05); animation-delay: -10s; filter: blur(80px); }
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(5%, 10%) scale(1.1); }
+            100% { transform: translate(-5%, 5%) scale(0.9); }
+        }
+        .cinematic-grid {
+            background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at center, black 20%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black 20%, transparent 80%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Scramble Text Loader -->
+    <div id="loader">
+        <div class="loader-perc" id="loader-perc">00</div>
+        <div class="loader-text-wrap" id="loader-text">[ M E N Y U S U N_ P E C A H A N_ W A K T U ]</div>
+    </div>
+
+    <!-- Core Effects -->
+    <div id="cursor-dot" class="hidden md:block"></div>
+    <div id="cursor-ring" class="hidden md:block"></div>
+    <div class="cinematic-grain"></div>
+    <div class="vignette"></div>
+    <canvas id="bg-canvas"></canvas>
+    <div class="nav-progress" id="progress-bar"></div>
+
+    <audio id="bg-music" loop>
+        <source src="teman1.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Tombol Audio Player -->
+    <div class="fixed top-6 right-6 md:top-8 md:right-8 z-[90] flex items-center gap-4 interactive-el cursor-pointer pointer-events-auto" onclick="toggleMusic()">
+        <div class="text-right hidden md:block opacity-60">
+            <p class="font-sans text-[10px] tracking-[0.2em] uppercase text-zinc-300" id="audio-status">Music</p>
+        </div>
+        <div id="music-visualizer" class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center relative group hover:border-white/50 transition-colors overflow-visible pointer-events-none">
+            <div class="w-1.5 h-1.5 bg-zinc-400 rounded-full transition-all duration-500 z-10 music-core"></div>
+            <div class="absolute inset-0 border-[1px] border-transparent rounded-full scale-50 opacity-0 music-ripple-1 pointer-events-none"></div>
+            <div class="absolute inset-0 border-[1px] border-transparent rounded-full scale-50 opacity-0 music-ripple-2 pointer-events-none"></div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="relative z-20">
+        
+        <!-- Hero Section -->
+        <section class="h-[100svh] w-full flex flex-col justify-center items-center text-center relative px-6 hero-section overflow-hidden">
+            
+            <!-- NEW PREMIUM FLUID BACKGROUND -->
+            <div class="absolute inset-0 z-0 bg-[#010101]" id="hero-bg">
+                <div class="ambient-blob blob-1"></div>
+                <div class="ambient-blob blob-2"></div>
+                <div class="ambient-blob blob-3"></div>
+                <!-- Interactive Spotlight -->
+                <div id="mouse-spotlight" class="absolute w-[50vw] h-[50vw] bg-accent/10 rounded-full blur-[120px] pointer-events-none transition-transform duration-1000 ease-out z-0" style="transform: translate(-50%, -50%); top: 0; left: 0;"></div>
+                
+                <div class="absolute inset-0 bg-black/40 z-10 backdrop-blur-[60px]"></div>
+                <div class="absolute inset-0 cinematic-grid z-20"></div>
+            </div>
+
+            <div class="relative z-30 w-full max-w-5xl mx-auto flex flex-col items-center">
+                <div class="mask-wrapper mb-8 intro-el">
+                    <p class="mask-up font-sans text-[10px] md:text-xs tracking-[0.4em] uppercase text-accent font-light">
+                        Fragmen Sunyi &bull; Untuk Ruang yang Kutinggalkan
+                    </p>
+                </div>
+                
+                <h1 class="font-serif text-6xl md:text-8xl lg:text-[9rem] text-zinc-100 font-light leading-[0.9] tracking-tighter flex flex-col items-center split-text intro-title">
+                    <span class="block">Maaf, Aku</span>
+                    <span class="italic text-zinc-500 block">Tersesat Bising.</span>
+                </h1>
+
+                <div class="mask-wrapper mt-12 intro-el">
+                    <p class="mask-up font-sans text-zinc-400 text-sm md:text-base max-w-md mx-auto font-light leading-relaxed">
+                         Di tengah riuhnya duniaku, aku kehilangan arah. Kesibukan mematikan telingaku, hingga aku mengabaikanmu beberapa hari ini dan melupakan tawa yang biasa meredam cemas di kepalaku.
+                    </p>
+                </div>
+
+                <!-- Scroll Indicator (Dipindah ke samping kanan agar tidak tumpang tindih) -->
+                <div class="absolute bottom-10 right-6 md:bottom-12 md:right-12 flex flex-col items-center gap-6 opacity-50 intro-el" id="scroll-indicator">
+                    <span class="font-sans text-[9px] uppercase tracking-[0.3em]" style="writing-mode: vertical-rl;">Menyelusuri Hening</span>
+                    <div class="w-[1px] h-16 md:h-24 bg-gradient-to-b from-white/0 via-white/50 to-white/0 overflow-hidden relative">
+                        <div class="w-full h-full bg-accent absolute top-0 left-0 -translate-y-full scroll-drop-anim"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chapter Layouts -->
+        <section class="py-32 md:py-52 relative">
+            <div class="max-w-7xl mx-auto px-6 lg:px-12 space-y-40 md:space-y-64">
+                
+                <!-- Chapter 1: Fana -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-20 items-center gs-chapter">
+                    <div class="md:col-span-5 relative fade-scale h-[60vh] md:h-[80vh] rounded-sm bg-[#010101] border border-white/5 overflow-hidden group flex items-center justify-center gs-parallax perspective-container interactive-clock-container">
+                        
+                        <div class="absolute w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.02)_0%,transparent_50%)] group-hover:bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.06)_0%,transparent_60%)] transition-colors duration-1000 clock-bg-glow z-0"></div>
+                        
+                        <div class="relative w-full h-full flex items-center justify-center preserve-3d clock-3d-wrapper z-10">
+                            <div class="absolute w-64 h-64 md:w-80 md:h-80 border-[1px] border-white/10 rounded-full clock-ring-1"></div>
+                            <div class="absolute w-48 h-48 md:w-60 md:h-60 border-[1px] border-dashed border-accent/40 rounded-full clock-ring-2"></div>
+                            <div class="absolute w-32 h-32 md:w-40 md:h-40 border-[1px] border-white/5 rounded-full clock-ring-3"></div>
+
+                            <div class="relative w-full h-full flex items-center justify-center preserve-3d">
+                                <div class="absolute w-[2px] h-32 md:h-40 bg-gradient-to-t from-transparent via-accent to-accent origin-bottom -translate-y-1/2 rounded-full opacity-80 shadow-[0_0_15px_#FF5A1F] clock-hand-slow"></div>
+                                <div class="absolute w-[1px] h-40 md:h-52 bg-gradient-to-t from-transparent via-white/50 to-white origin-bottom -translate-y-1/2 rounded-full opacity-50 shadow-[0_0_10px_white] clock-hand-fast"></div>
+                                <div class="absolute w-3 h-3 bg-darker border border-accent rounded-full z-10 shadow-[0_0_20px_#FF5A1F] group-hover:scale-150 transition-transform duration-500"></div>
+                            </div>
+                        </div>
+
+                        <!-- Sands of Time -->
+                        <div id="sand-container" class="absolute inset-0 z-30 pointer-events-none preserve-3d"></div>
+
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,#030305_95%)] pointer-events-none z-20"></div>
+                        <div class="absolute bottom-8 left-8 text-6xl font-serif text-white/5 font-bold z-20 group-hover:text-accent/30 transition-colors duration-700">01</div>
+                    </div>
+
+                    <div class="md:col-span-7 flex flex-col justify-center gs-text-block">
+                        <div class="mask-wrapper mb-6">
+                            <span class="mask-up text-accent text-[10px] tracking-[0.4em] uppercase font-light">Jeda</span>
+                        </div>
+                        <h2 class="font-serif text-4xl md:text-6xl text-zinc-100 mb-8 leading-[1.1] font-normal split-text">
+                            <span class="block">Waktu yang</span>
+                            <span class="italic text-zinc-500 block">Tersita.</span>
+                        </h2>
+                        <div class="fade-scale">
+                            <p class="font-sans text-zinc-400 font-light leading-[2] text-sm md:text-lg max-w-lg">
+                                 Tersihir oleh ego dan urusanku sendiri, aku sempat berlari tanpa memedulikan sekeliling. Maafkan aku yang menghilang, membiarkan pesan-pesanmu mengambang tanpa jawaban, seolah waktu tak menyisakan ruang untuk kita.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chapter 2: Ikrar -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-20 items-center gs-chapter">
+                    <div class="md:col-span-7 flex flex-col justify-center md:text-right order-2 md:order-1 items-start md:items-end gs-text-block">
+                        <div class="mask-wrapper mb-6">
+                            <span class="mask-up text-accent text-[10px] tracking-[0.4em] uppercase font-light">Nadi</span>
+                        </div>
+                        <h2 class="font-serif text-4xl md:text-6xl text-zinc-100 mb-8 leading-[1.1] font-normal split-text">
+                            <span class="block">Janji yang</span>
+                            <span class="italic text-zinc-500 block">Menolak Putus.</span>
+                        </h2>
+                        <div class="fade-scale">
+                            <p class="font-sans text-zinc-400 font-light leading-[2] text-sm md:text-lg max-w-lg md:ml-auto">
+ Ingatkah ikrar kita? Bahwa kelak, meski kita telah menemukan pasangan hidup masing-masing, status kita akan selalu menjadi sahabat. Terpisahnya kita antara Indonesia dan Malaysia takkan sanggup memotong denyut persaudaraan ini.                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="md:col-span-5 relative fade-scale h-[60vh] md:h-[80vh] rounded-sm bg-[#010101] border border-white/5 overflow-hidden group flex items-center justify-center order-1 md:order-2 gs-parallax interactive-thread-container perspective-container">
+                        <div class="relative w-full h-full flex items-center justify-center preserve-3d">
+
+                            <div class="absolute w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.03)_0%,transparent_50%)] group-hover:bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.08)_0%,transparent_50%)] transition-colors duration-1000 thread-bg-glow"></div>
+
+                            <svg viewBox="0 0 200 400" preserveAspectRatio="none" class="absolute w-full h-full overflow-visible py-10 opacity-80 group-hover:opacity-100 transition-opacity duration-1000 preserve-3d z-10">
+                                <defs>
+                                    <filter id="thread-glow" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feGaussianBlur stdDeviation="3" result="blur" />
+                                        <feMerge>
+                                            <feMergeNode in="blur" />
+                                            <feMergeNode in="SourceGraphic" />
+                                        </feMerge>
+                                    </filter>
+                                    <linearGradient id="thread-grad-orange" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="transparent" />
+                                        <stop offset="20%" stop-color="#FF5A1F" />
+                                        <stop offset="50%" stop-color="#ff7f50" />
+                                        <stop offset="80%" stop-color="#FF5A1F" />
+                                        <stop offset="100%" stop-color="transparent" />
+                                    </linearGradient>
+                                    <linearGradient id="thread-grad-white" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="transparent" />
+                                        <stop offset="20%" stop-color="rgba(255,255,255,0.2)" />
+                                        <stop offset="50%" stop-color="rgba(255,255,255,0.6)" />
+                                        <stop offset="80%" stop-color="rgba(255,255,255,0.2)" />
+                                        <stop offset="100%" stop-color="transparent" />
+                                    </linearGradient>
+                                </defs>
+
+                                <g class="thread-knot-group" style="transform-origin: 100px 200px;">
+                                    <path class="gs-thread-path" d="M 20,-50 C 60,50 160,120 100,200 C 50,260 150,260 100,200" fill="none" stroke="url(#thread-grad-orange)" stroke-width="2" filter="url(#thread-glow)"/>
+                                    <path class="gs-thread-path" d="M 180,450 C 140,350 40,280 100,200 C 150,140 50,140 100,200" fill="none" stroke="url(#thread-grad-white)" stroke-width="2" filter="url(#thread-glow)"/>
+                                    <circle cx="100" cy="200" r="3" fill="#fff" filter="url(#thread-glow)" class="gs-thread-spark" />
+                                </g>
+                            </svg>
+
+                            <div class="absolute inset-0 z-10 overflow-hidden pointer-events-none gs-tension-ring preserve-3d">
+                                <div class="absolute top-[45%] left-[45%] w-1 h-1 bg-accent rounded-full shadow-[0_0_10px_#FF5A1F] animate-float-up-1"></div>
+                                <div class="absolute top-[55%] right-[45%] w-1.5 h-1.5 bg-white/60 rounded-full shadow-[0_0_10px_white] animate-float-up-2"></div>
+                            </div>
+
+                            <div class="absolute w-16 h-16 border-[0.5px] border-accent/20 rounded-full animate-[ping_4s_cubic-bezier(0,0,0.2,1)_infinite] z-0 gs-tension-ring"></div>
+                            <div class="absolute w-32 h-32 border-[0.5px] border-white/10 rounded-full animate-[ping_4s_cubic-bezier(0,0,0.2,1)_infinite_2s] z-0 gs-tension-ring"></div>
+
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#030305_95%)] pointer-events-none z-20"></div>
+                            <div class="absolute bottom-8 right-8 text-6xl font-serif text-white/5 font-bold z-20 group-hover:text-accent/30 transition-colors duration-700">02</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chapter 3: Pulang -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-20 items-center pt-20 gs-chapter">
+                    <div class="md:col-span-5 relative fade-scale h-[60vh] md:h-[80vh] rounded-sm bg-[#010101] border border-white/5 overflow-hidden group flex items-center justify-center gs-parallax interactive-arch perspective-container">
+                        <div class="relative w-full h-full flex flex-col items-center justify-center arch-container">
+                            
+                            <div class="absolute w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.02)_0%,transparent_60%)] group-hover:bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.08)_0%,transparent_60%)] transition-colors duration-1000 arch-layer-bg"></div>
+
+                            <div class="arch-layer pb-20 arch-layer-mid">
+                                <div class="relative w-40 h-64 md:w-48 md:h-72 border-t border-l border-r border-white/10 rounded-t-[100px] flex items-end justify-center pb-8 group-hover:border-white/30 transition-colors duration-1000 z-10 overflow-hidden">
+                                    <div class="absolute inset-0 rounded-t-[100px] bg-gradient-to-b from-transparent to-accent/5 group-hover:to-accent/20 transition-colors duration-1000"></div>
+                                </div>
+                            </div>
+
+                            <div class="arch-layer pb-28 arch-layer-front">
+                                <div class="relative z-20 flex flex-col items-center justify-center mb-4 hearth-center">
+                                    <div class="w-2 h-2 bg-white rounded-full shadow-[0_0_15px_white] group-hover:scale-125 transition-transform duration-700"></div>
+                                    <div class="absolute w-20 h-20 bg-accent/40 blur-[20px] rounded-full animate-pulse group-hover:bg-accent/60 transition-colors duration-1000"></div>
+                                </div>
+                            </div>
+                            
+                            <div id="pigment-container" class="absolute inset-0 z-30 pointer-events-none preserve-3d"></div>
+
+                            <div class="w-64 md:w-80 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:via-accent/50 transition-colors duration-1000 relative z-10 arch-layer-floor mt-64"></div>
+
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,#030305_95%)] pointer-events-none z-20"></div>
+                            <div class="absolute bottom-8 left-8 text-6xl font-serif text-white/5 font-bold z-20 group-hover:text-accent/30 transition-colors duration-700 arch-layer-num">03</div>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-7 flex flex-col justify-center gs-text-block">
+                        <div class="mask-wrapper mb-6">
+                            <span class="mask-up text-accent text-[10px] tracking-[0.4em] uppercase font-light">Menepi</span>
+                        </div>
+                        <h2 class="font-serif text-4xl md:text-6xl text-zinc-100 mb-8 leading-[1.1] font-normal split-text">
+                            <span class="block">Ruang</span>
+                            <span class="italic text-zinc-500 block">Tanpa Kunci.</span>
+                        </h2>
+                        <div class="fade-scale">
+                            <p class="font-sans text-zinc-400 font-light leading-[2] text-sm md:text-lg max-w-lg">
+                                Kini aku tersadar, duniaku tak ada artinya tanpa teman berbagi cerita. Bilik di sudut ingatanku tak pernah mengunci pintunya untukmu. Kembalilah, kursimu masih kosong menanti untuk kita menyambung tawa dari dua negara.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Quote & Action Section -->
+        <section class="min-h-screen flex flex-col justify-center items-center text-center px-6 relative pt-20 pb-40 gs-chapter">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[30rem] font-serif text-white/[0.02] leading-none pointer-events-none select-none z-0 gs-quote-bg">"</div>
+            
+            <div class="max-w-4xl mx-auto relative z-10 gs-text-block">
+                <h3 class="font-serif text-3xl md:text-5xl lg:text-7xl text-zinc-200 leading-[1.2] mb-16 font-light split-text">
+                    <span class="block">"Maaf, mataku sempat dibutakan</span>
+                    <span class="block">oleh gemerlap dunia yang bising.</span>
+                    <span class="italic text-zinc-500 text-2xl md:text-5xl block mt-4">Sejauh apa pun jarak Indonesia dan Malaysia memisahkan kita, kaulah satu-satunya tempat persahabatanku berpulang."</span>
+                </h3>
+                
+                <div class="fade-scale mt-12 flex flex-col items-center">
+                    
+                    <!-- TOMBOL SURAT -->
+                    <button onclick="openLetterModal()" class="interactive-el mb-10 font-sans text-[10px] md:text-xs tracking-[0.3em] uppercase text-zinc-400 hover:text-accent transition-colors relative group cursor-none">
+                        [ Baca Surat yang Tertinggal ]
+                        <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-[1px] bg-accent group-hover:w-full transition-all duration-500"></div>
+                    </button>
+
+                    <!-- Tombol WA -->
+                    <div class="magnetic-wrap inline-block p-4" onclick="openWaModal()">
+                        <button class="interactive-el glass-panel px-10 py-5 rounded-full flex items-center gap-6 mx-auto group hover:bg-white/5 transition-all duration-500 border border-white/10 hover:border-accent/50 relative overflow-hidden magnetic-btn cursor-none">
+                            <div class="absolute inset-0 bg-accent/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
+                            <span class="relative z-10 font-sans text-[10px] tracking-[0.3em] uppercase text-zinc-200 group-hover:text-white transition-colors magnetic-text">Kirimkan Gema Hatimu (Sapa Aku)</span>
+                            <div class="relative z-10 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-accent group-hover:text-dark transition-all duration-500 magnetic-icon overflow-visible">
+                                <div class="relative flex items-center justify-center w-full h-full">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-current abstract-spark relative z-10">
+                                        <path d="M12 0C12 6.627 17.373 12 24 12C17.373 12 12 17.373 12 24C12 17.373 6.627 12 0 12C6.627 12 12 6.627 12 0Z" fill="currentColor"/>
+                                    </svg>
+                                    <div class="absolute inset-[3px] border border-current rounded-full opacity-40 abstract-ring"></div>
+                                    <div class="absolute inset-0 border border-current rounded-full opacity-0 abstract-pulse pointer-events-none"></div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="py-10 text-center border-t border-white/[0.03] relative z-20">
+            <p class="font-sans text-[9px] text-zinc-600 tracking-[0.4em] uppercase font-light">
+                Untuk jiwa yang pernah menanggung luka bersama <span class="mx-4 text-accent/50">✦</span> Biar jarak membentang luas, denyut kita berdetak di frekuensi yang sama.
+            </p>
+        </footer>
+    </main>
+
+    <!-- MODAL SURAT (BARU & LEBIH KEREN BGT) -->
+    <div id="letter-modal" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 backdrop-blur-2xl opacity-0 pointer-events-none transition-opacity duration-700 perspective-container">
+        
+        <!-- Wadah Surat Berdesain Mewah -->
+        <div class="bg-[#030305] p-10 md:p-20 w-full max-w-4xl relative mx-4 letter-content shadow-[0_0_100px_rgba(255,90,31,0.05)] border border-white/5 overflow-hidden opacity-0" style="transform: rotateX(20deg) translateY(50px) translateZ(-100px);">
+            
+            <!-- Sudut Futuristik/Elegan -->
+            <div class="absolute top-0 left-0 w-8 h-8 border-t border-l border-accent/50"></div>
+            <div class="absolute top-0 right-0 w-8 h-8 border-t border-r border-accent/50"></div>
+            <div class="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-accent/50"></div>
+            <div class="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-accent/50"></div>
+
+            <!-- Pendaran Ethereal di Latar Surat -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,90,31,0.03)_0%,transparent_70%)] pointer-events-none z-0"></div>
+
+            <!-- Tombol Close -->
+            <button onclick="closeLetterModal()" class="interactive-el absolute top-8 right-8 w-10 h-10 flex items-center justify-center text-zinc-600 hover:text-white transition-colors group cursor-none z-20">
+                <span class="w-full h-[1px] bg-current absolute rotate-45 group-hover:bg-accent transition-colors"></span>
+                <span class="w-full h-[1px] bg-current absolute -rotate-45 group-hover:bg-accent transition-colors"></span>
+            </button>
+            
+            <!-- Isi Surat untuk GSAP -->
+            <div class="relative z-10">
+                <div class="text-center mb-16 overflow-hidden">
+                    <p class="font-sans text-accent text-[10px] tracking-[0.5em] uppercase mb-6 letter-anim">Sebuah Pengakuan</p>
+                    <h3 class="font-serif text-5xl md:text-7xl text-zinc-100 font-light letter-anim">Kepada Ruang<br><span class="italic text-zinc-500">Kosong.</span></h3>
+                </div>
+                
+                <div class="font-sans text-zinc-300 text-sm md:text-lg font-light leading-[2.5] space-y-8 text-center max-w-2xl mx-auto">
+                    <div class="overflow-hidden"><p class="letter-anim">Kita pernah berjanji, kelak walau kita sudah memiliki jalan hidup dan pasangan masing-masing, kita akan tetap menjadi sahabat</p></div>
+                    <div class="overflow-hidden"><p class="letter-anim">Namun nyatanya, duniaku terlalu bising. Sibukku mengambil kesadaranku, membuatku tuli hingga aku menghilang dan tak menghubungimu selama beberapa hari ini.</p></div>
+                    <div class="overflow-hidden"><p class="letter-anim">Melalui lembar yang kurajut ini, kusampaikan permohonan maaf yang sedalam-dalamnya. Inilah satu-satunya cara yang mampu kutempuh. Aku bukanlah pria romantis yang pandai menebak isi hati, pun bukan sosok yang cakap memahami keadaanmu. Ketidakmampuanku inilah yang sempat memupuk rasa gentar untuk mendekati wanita. Namun, saat kucoba melangkah ke arahmu, aku justru tersandung kekhilafan. Kumohon, maafkanlah segala kepolosan dan ketidaktahuanku ini. </p></div>
+                    <div class="overflow-hidden"><p class="letter-anim italic text-accent font-medium mt-4"arak antara Indonesia dan Malaysia tidak akan pernah bisa memutus persahabatan kita. Tolong, maafkan aku dan mari kita sambung kembali cerita kita.</p></div>
+                </div>
+                
+                <div class="mt-20 text-center overflow-hidden">
+                    <p class="font-serif italic text-zinc-600 text-2xl letter-anim">Dari sahabatmu yang merindu.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal WA -->
+    <div id="wa-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-dark/95 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-700 ease-[cubic-bezier(0.7,0,0.3,1)]">
+        <div class="bg-[#050507] p-10 md:p-16 w-full max-w-2xl transform translate-y-10 scale-95 transition-all duration-700 ease-[cubic-bezier(0.7,0,0.3,1)] border border-white/10 relative mx-4 modal-content shadow-[0_30px_60px_rgba(0,0,0,0.5)]">
+            <button onclick="closeWaModal()" class="interactive-el absolute top-6 right-6 w-10 h-10 flex items-center justify-center text-zinc-600 hover:text-white transition-colors group cursor-none">
+                <span class="w-full h-[1px] bg-current absolute rotate-45 group-hover:bg-accent transition-colors"></span>
+                <span class="w-full h-[1px] bg-current absolute -rotate-45 group-hover:bg-accent transition-colors"></span>
+            </button>
+            <div class="mb-12">
+                <p class="font-sans text-accent text-[10px] tracking-[0.4em] uppercase mb-4">Gema dari Jauh</p>
+                <h3 class="font-serif text-4xl text-zinc-100 font-light">Sebaris Rindu.</h3>
+                <p class="font-sans text-zinc-500 text-sm mt-2 font-light">Biarkan aksara rapuh ini melintasi ruang hampa, merobohkan sekat ego, dan menyambung kembali cerita yang sempat terjeda.</p>
+            </div>
+            <div class="input-group">
+                <textarea id="wa-message" rows="4" placeholder=" "></textarea>
+                <label for="wa-message">Tumpahkan resah yang lama mengendap...</label>
+            </div>
+            <div class="flex justify-end mt-8">
+                <button onclick="sendToWa()" class="interactive-el px-8 py-4 bg-white text-dark hover:bg-accent font-sans tracking-[0.2em] uppercase text-[10px] font-medium transition-all duration-500 flex items-center gap-3 cursor-none group">
+                    Lepaskan Menembus Jarak
+                    <div class="relative flex items-center justify-center w-5 h-5 ml-1">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-current abstract-spark relative z-10">
+                            <path d="M12 0C12 6.627 17.373 12 24 12C17.373 12 12 17.373 12 24C12 17.373 6.627 12 0 12C6.627 12 12 6.627 12 0Z" fill="currentColor"/>
+                        </svg>
+                        <div class="absolute inset-0 border border-current rounded-full opacity-30 abstract-ring"></div>
+                        <div class="absolute -inset-1 border border-current rounded-full opacity-0 abstract-pulse pointer-events-none"></div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        #wa-modal.active { opacity: 1; pointer-events: auto; }
+        #wa-modal.active .modal-content { transform: translateY(0) scale(1); }
+        
+        /* CSS Modal Surat hanya handle overlay background saja, isi surat dihandle GSAP */
+        #letter-modal.active { opacity: 1; pointer-events: auto; }
+    </style>
+
+    <script>
+        // --- 0. Initialize SplitType ---
+        if (typeof SplitType !== 'undefined') {
+            const splitTextEls = document.querySelectorAll('.split-text');
+            splitTextEls.forEach(el => { new SplitType(el, { types: 'words, chars' }); });
+        }
+
+        // --- 1. Sound Engine (Web Audio API) ---
+        let audioCtx;
+        function initAudio() {
+            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        window.addEventListener('click', initAudio, { once: true });
+        window.addEventListener('keydown', initAudio, { once: true });
+
+        function playHoverSFX() {
+            if(!audioCtx || audioCtx.state !== 'running') return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.02, audioCtx.currentTime); 
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function playRevealSFX() {
+            if(!audioCtx || audioCtx.state !== 'running') return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine'; osc.frequency.setValueAtTime(60, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.2);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.5);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 1.5);
+        }
+
+        // --- 2. GSAP & Lenis Setup ---
+        if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+
+            if (typeof Lenis !== 'undefined') {
+                const lenis = new Lenis({
+                    duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    direction: 'vertical', gestureDirection: 'vertical', smooth: true,
+                });
+
+                lenis.on('scroll', ScrollTrigger.update);
+                gsap.ticker.add((time)=>{ lenis.raf(time * 1000) });
+                gsap.ticker.lagSmoothing(0);
+                lenis.on('scroll', (e) => { gsap.to('#progress-bar', { scaleX: e.progress, duration: 0.1, ease: 'none' }); });
+                
+                // Expose lenis globally for modals
+                window.lenis = lenis;
+            }
+        }
+
+        // --- 3. Scramble Text Loader ---
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+        const finalTarget = "[ M E N R A N G K A I   P E C A H A N   W A K T U ]";
+        const loaderText = document.getElementById('loader-text');
+        const loaderPerc = document.getElementById('loader-perc');
+        
+        function scrambleStr(target) {
+            let res = "";
+            for(let i=0; i<target.length; i++) res += target[i] === " " ? " " : chars[Math.floor(Math.random() * chars.length)];
+            return res;
+        }
+
+        window.addEventListener('load', () => {
+            let progress = 0;
+            const loadInterval = setInterval(() => {
+                progress += Math.floor(Math.random() * 4) + 1;
+                if(progress >= 100) {
+                    progress = 100; clearInterval(loadInterval);
+                    loaderPerc.innerText = '100'; loaderText.innerText = finalTarget; 
+                    setTimeout(playIntro, 600);
+                } else {
+                    loaderPerc.innerText = progress < 10 ? `0${progress}` : progress;
+                    loaderText.innerText = scrambleStr(finalTarget);
+                }
+            }, 30); 
+        });
+
+        function playIntro() {
+            if (typeof gsap !== 'undefined') {
+                const tl = gsap.timeline();
+                tl.to("#loader", { yPercent: -100, duration: 1.2, ease: "expo.inOut" })
+                  .fromTo(".intro-title .char", { y: 100, opacity: 0, rotationZ: 10 }, { y: 0, opacity: 1, rotationZ: 0, duration: 1.5, stagger: 0.03, ease: "power4.out" }, "-=0.4")
+                  .fromTo(".intro-el .mask-up", { y: "120%", opacity: 0 }, { y: "0%", opacity: 1, duration: 1.5, stagger: 0.15, ease: "expo.out" }, "-=1")
+                  .fromTo("#scroll-indicator", { opacity: 0 }, { opacity: 0.5, duration: 1.5, ease: "power2.out" }, "-=1");
+            }
+        }
+
+        const NOMOR_WA = "6287738955980"; 
+        const defaultMessage = "Sahabat, maafkan bisingnya duniaku yang sempat membuatku tuli dan menjauh. Masih adakah kursi kosong di ruang tamu ingatanmu, untukku kembali duduk dan bercerita?";
+        document.getElementById('wa-message').value = defaultMessage;
+
+        // --- 4. Premium GSAP Cursor & Global Hover ---
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorRing = document.getElementById('cursor-ring');
+        const mouseSpotlight = document.getElementById('mouse-spotlight');
+        
+        if (typeof gsap !== 'undefined' && cursorDot && cursorRing) {
+            gsap.set(cursorDot, {xPercent: -50, yPercent: -50});
+            gsap.set(cursorRing, {xPercent: -50, yPercent: -50});
+            if(mouseSpotlight) gsap.set(mouseSpotlight, {xPercent: -50, yPercent: -50});
+
+            let xToDot = gsap.quickTo(cursorDot, "x", {duration: 0.1, ease: "power3"});
+            let yToDot = gsap.quickTo(cursorDot, "y", {duration: 0.1, ease: "power3"});
+            let xToRing = gsap.quickTo(cursorRing, "x", {duration: 0.6, ease: "power3.out"});
+            let yToRing = gsap.quickTo(cursorRing, "y", {duration: 0.6, ease: "power3.out"});
+            let xToSpotlight = mouseSpotlight ? gsap.quickTo(mouseSpotlight, "x", {duration: 1.5, ease: "power2.out"}) : null;
+            let yToSpotlight = mouseSpotlight ? gsap.quickTo(mouseSpotlight, "y", {duration: 1.5, ease: "power2.out"}) : null;
+
+            if (window.matchMedia("(hover: hover)").matches) {
+                window.addEventListener('mousemove', (e) => {
+                    xToDot(e.clientX); yToDot(e.clientY);
+                    xToRing(e.clientX); yToRing(e.clientY);
+                    if(xToSpotlight && yToSpotlight) {
+                        xToSpotlight(e.clientX); yToSpotlight(e.clientY);
+                    }
+                });
+
+                document.querySelectorAll('.interactive-el, a, button').forEach(el => {
+                    el.addEventListener('mouseenter', () => {
+                        playHoverSFX(); 
+                        gsap.to(cursorDot, { scale: 0, duration: 0.3 });
+                        gsap.to(cursorRing, { width: 80, height: 80, borderColor: '#FF5A1F', backgroundColor: 'rgba(255, 90, 31, 0.05)', backdropFilter: 'blur(2px)', duration: 0.4, ease: 'back.out(1.5)' });
+                    });
+                    el.addEventListener('mouseleave', () => {
+                        gsap.to(cursorDot, { scale: 1, duration: 0.3 });
+                        gsap.to(cursorRing, { width: 40, height: 40, borderColor: 'rgba(255, 255, 255, 0.2)', backgroundColor: 'transparent', backdropFilter: 'blur(0px)', duration: 0.4, ease: 'power2.out' });
+                    });
+                });
+
+                /* ==========================================
+                   BAB 1: WAKTU YANG BERDUSTA (THE CHAOTIC CLOCK) 
+                   ========================================== */
+                const interactiveClock = document.querySelector('.interactive-clock-container');
+                const clockWrapper = document.querySelector('.clock-3d-wrapper');
+                const handSlow = document.querySelector('.clock-hand-slow');
+                const handFast = document.querySelector('.clock-hand-fast');
+                const ring1 = document.querySelector('.clock-ring-1');
+                const ring2 = document.querySelector('.clock-ring-2');
+                const ring3 = document.querySelector('.clock-ring-3');
+                const sandContainer = document.getElementById('sand-container');
+
+                if(interactiveClock) {
+                    gsap.to(ring1, { rotation: 360, duration: 30, repeat: -1, ease: "none" });
+                    gsap.to(ring2, { rotation: -360, duration: 20, repeat: -1, ease: "none" });
+                    gsap.to(ring3, { rotation: 360, duration: 15, repeat: -1, ease: "none" });
+                    
+                    // Animasi masuk (Entry Animation) untuk jarum jam saat di-scroll
+                    ScrollTrigger.create({
+                        trigger: interactiveClock,
+                        start: "top 65%",
+                        onEnter: () => {
+                            // Memutar jarum panjang secara slow-motion (berkurang jadi 2 putaran, durasi 8 detik)
+                            gsap.fromTo(handFast, 
+                                { rotation: -720 }, 
+                                { rotation: 0, duration: 8, ease: "power3.out" }
+                            );
+                            // Memutar jarum pendek secara super slow-motion (berkurang jadi 1 putaran, durasi 10 detik)
+                            gsap.fromTo(handSlow, 
+                                { rotation: 360 }, 
+                                { rotation: 0, duration: 10, ease: "power2.out" }
+                            );
+                        },
+                        once: true
+                    });
+                    
+                    let lastSandTime = 0;
+
+                    interactiveClock.addEventListener('mousemove', (e) => {
+                        const rect = interactiveClock.getBoundingClientRect();
+                        const xNorm = (e.clientX - rect.left - (rect.width / 2)) / (rect.width / 2);
+                        const yNorm = (e.clientY - rect.top - (rect.height / 2)) / (rect.height / 2);
+
+                        gsap.to(clockWrapper, { rotationY: xNorm * 25, rotationX: -yNorm * 25, duration: 0.5, ease: "power2.out" });
+
+                        gsap.to(handSlow, { rotation: "+=" + (xNorm * 40), duration: 0.5, ease: "power2.out" });
+                        gsap.to(handFast, { rotation: "-=" + (yNorm * 80), duration: 0.3, ease: "power2.out" });
+
+                        const currentTime = Date.now();
+                        if(currentTime - lastSandTime > 40) {
+                            createSand(xNorm, yNorm, rect);
+                            lastSandTime = currentTime;
+                        }
+                    });
+
+                    interactiveClock.addEventListener('mouseleave', () => {
+                        gsap.to(clockWrapper, { rotationY: 0, rotationX: 0, duration: 1.5, ease: "elastic.out(1, 0.3)" });
+                    });
+
+                    function createSand(xNorm, yNorm, rect) {
+                        const sand = document.createElement('div');
+                        sand.classList.add('pigment');
+                        
+                        const size = Math.random() * 2 + 1;
+                        sand.style.width = `${size}px`;
+                        sand.style.height = `${size}px`;
+                        sand.style.backgroundColor = 'rgba(255, 120, 50, 0.9)'; 
+                        sand.style.boxShadow = '0 0 8px rgba(255, 120, 50, 0.6)';
+
+                        const startX = (rect.width / 2) + (xNorm * 30);
+                        const startY = (rect.height / 2) + (yNorm * 30);
+
+                        sand.style.left = `${startX}px`;
+                        sand.style.top = `${startY}px`;
+                        sandContainer.appendChild(sand);
+
+                        gsap.to(sand, {
+                            x: `+=${(Math.random() - 0.5) * 300}`,
+                            y: `+=${(Math.random() - 0.5) * 300}`,
+                            z: `+=${Math.random() * 100}`,
+                            opacity: 0,
+                            duration: Math.random() * 1 + 0.5,
+                            ease: "power2.out",
+                            onComplete: () => sand.remove()
+                        });
+                    }
+                }
+
+                /* ==========================================
+                   BAB 2: BENANG TAKDIR (THE UNBROKEN THREAD) 
+                   ========================================== */
+                const interactiveThread = document.querySelector('.interactive-thread-container');
+                const threadGroup = document.querySelector('.thread-knot-group');
+                const threadGlow = document.querySelector('.thread-bg-glow');
+
+                if(interactiveThread) {
+                    interactiveThread.addEventListener('mousemove', (e) => {
+                        const rect = interactiveThread.getBoundingClientRect();
+                        const xNorm = (e.clientX - rect.left - (rect.width / 2)) / (rect.width / 2);
+                        const yNorm = (e.clientY - rect.top - (rect.height / 2)) / (rect.height / 2);
+
+                        gsap.to(threadGroup, { 
+                            x: xNorm * 10, y: yNorm * 5, rotation: xNorm * 5, 
+                            scaleX: 1 + Math.abs(xNorm) * 0.05,
+                            transformOrigin: '50% 50%',
+                            duration: 0.8, ease: "power2.out" 
+                        });
+                        gsap.to(threadGlow, { x: xNorm * 30, y: yNorm * 30, duration: 1, ease: "power2.out" });
+                    });
+
+                    interactiveThread.addEventListener('mouseleave', () => {
+                        gsap.to([threadGroup, threadGlow], { x: 0, y: 0, rotation: 0, scaleX: 1, duration: 1.5, ease: "elastic.out(1, 0.3)" });
+                    });
+                }
+
+                /* ==========================================
+                   BAB 3: RUMAH TANPA PINTU (OPEN ARCHWAY) 
+                   ========================================== */
+                const interactiveArch = document.querySelector('.interactive-arch');
+                const layerBg = document.querySelector('.arch-layer-bg');
+                const layerMid = document.querySelector('.arch-layer-mid');
+                const layerFront = document.querySelector('.arch-layer-front');
+                const layerFloor = document.querySelector('.arch-layer-floor');
+                const layerNum = document.querySelector('.arch-layer-num');
+                const pigmentContainer = document.getElementById('pigment-container');
+
+                if(interactiveArch) {
+                    let lastPigmentTime = 0;
+                    interactiveArch.addEventListener('mousemove', (e) => {
+                        const rect = interactiveArch.getBoundingClientRect();
+                        const xNorm = (e.clientX - rect.left - (rect.width / 2)) / (rect.width / 2);
+                        const yNorm = (e.clientY - rect.top - (rect.height / 2)) / (rect.height / 2);
+
+                        gsap.to(layerBg, { x: xNorm * 10, y: yNorm * 10, duration: 1, ease: "power2.out" });
+                        gsap.to(layerMid, { x: xNorm * -15, y: yNorm * -10, rotationY: xNorm * 5, duration: 0.8, ease: "power2.out" });
+                        gsap.to(layerFront, { x: xNorm * -30, y: yNorm * -20, rotationY: xNorm * 10, duration: 0.6, ease: "power2.out" });
+                        gsap.to(layerFloor, { x: xNorm * -5, duration: 1, ease: "power2.out" });
+                        gsap.to(layerNum, { x: xNorm * 20, y: yNorm * 10, duration: 1, ease: "power2.out" });
+
+                        const currentTime = Date.now();
+                        if(currentTime - lastPigmentTime > 50) {
+                            createPigment(xNorm, yNorm, rect);
+                            lastPigmentTime = currentTime;
+                        }
+                    });
+
+                    interactiveArch.addEventListener('mouseleave', () => {
+                        gsap.to([layerBg, layerMid, layerFront, layerFloor, layerNum], { x: 0, y: 0, rotationY: 0, duration: 1.5, ease: "elastic.out(1, 0.3)" });
+                    });
+
+                    function createPigment(xNorm, yNorm, rect) {
+                        const pigment = document.createElement('div');
+                        pigment.classList.add('pigment');
+                        
+                        const isFlower = Math.random() > 0.5;
+                        const size = isFlower ? Math.random() * 6 + 4 : Math.random() * 3 + 1;
+                        
+                        pigment.style.width = `${size}px`; pigment.style.height = `${size}px`;
+                        const colors = ['rgba(255, 90, 31, 0.8)', 'rgba(255, 150, 100, 0.6)', 'rgba(255, 255, 255, 0.5)'];
+                        pigment.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        
+                        if(isFlower) {
+                            pigment.style.borderRadius = "50% 0 50% 0";
+                            pigment.style.boxShadow = "0 0 10px rgba(255,255,255,0.2)";
+                        } else {
+                            pigment.style.boxShadow = `0 0 10px ${pigment.style.backgroundColor}`;
+                        }
+
+                        const startX = (rect.width / 2) + (xNorm * -30) + ((Math.random() - 0.5) * 40);
+                        const startY = (rect.height / 2) + 100 + (yNorm * -20) + ((Math.random() - 0.5) * 20);
+
+                        pigment.style.left = `${startX}px`; pigment.style.top = `${startY}px`;
+                        pigmentContainer.appendChild(pigment);
+
+                        gsap.to(pigment, {
+                            y: `-=${Math.random() * 150 + 100}`, x: `+=${(Math.random() - 0.5) * 100}`,
+                            rotation: Math.random() * 360, opacity: 0, duration: Math.random() * 2 + 1.5,
+                            ease: "power1.out", onComplete: () => pigment.remove()
+                        });
+                    }
+                }
+            }
+        }
+
+        if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+            // --- Tying the Knot Animation (Chapter 2 Scroll Trigger) ---
+            const threadPaths = document.querySelectorAll('.gs-thread-path');
+            const threadSpark = document.querySelector('.gs-thread-spark');
+            const tensionRings = document.querySelectorAll('.gs-tension-ring');
+
+            if(threadPaths.length) {
+                gsap.set(threadPaths, { strokeDasharray: 1000, strokeDashoffset: 1000 });
+                gsap.set(threadSpark, { scale: 0, opacity: 0, transformOrigin: '50% 50%' });
+                gsap.set(tensionRings, { opacity: 0 });
+
+                ScrollTrigger.create({
+                    trigger: '.interactive-thread-container', start: "top 65%",
+                    onEnter: () => {
+                        const tl = gsap.timeline();
+                        tl.to(threadPaths, { strokeDashoffset: 0, duration: 2.5, ease: "power2.inOut" })
+                          .to(threadSpark, { scale: 1.5, opacity: 1, duration: 0.5, ease: "back.out(2)" }, "-=0.3")
+                          .to(tensionRings, { opacity: 1, duration: 1, ease: "power2.out" }, "-=0.3")
+                          .to(threadSpark, { scale: 1, repeat: -1, yoyo: true, duration: 1.5, ease: "sine.inOut" });
+                    }, once: true
+                });
+            }
+
+            // --- Split Text & Chapter Reveal Animations ---
+            gsap.utils.toArray('.gs-chapter').forEach(chapter => {
+                ScrollTrigger.create({ trigger: chapter, start: "top 60%", onEnter: () => playRevealSFX(), once: true });
+            });
+
+            gsap.utils.toArray('.gs-text-block').forEach(block => {
+                const chars = block.querySelectorAll('.char'); 
+                const masks = block.querySelectorAll('.mask-up');
+                const fades = block.querySelectorAll('.fade-scale');
+                
+                const tl = gsap.timeline({ scrollTrigger: { trigger: block, start: "top 85%" } });
+
+                if(chars.length) { tl.fromTo(chars, { y: 100, opacity: 0, rotationZ: 5 }, { y: 0, opacity: 1, rotationZ: 0, duration: 1.2, stagger: 0.02, ease: "power4.out" }); }
+                if(masks.length) { tl.fromTo(masks, { y: "120%", opacity: 0 }, { y: "0%", opacity: 1, duration: 1.2, stagger: 0.1, ease: "expo.out" }, "-=0.8"); }
+                if(fades.length) { tl.fromTo(fades, { y: 40, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 1.5, ease: "power3.out" }, "-=1"); }
+            });
+
+            gsap.utils.toArray('.gs-parallax').forEach(el => {
+                gsap.fromTo(el, { y: 100, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 1.8, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 90%" } });
+                gsap.to(el, { yPercent: 15, ease: "none", scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } });
+            });
+
+            gsap.to(".gs-quote-bg", { y: 200, ease: "none", scrollTrigger: { trigger: ".gs-quote-bg", start: "top bottom", end: "bottom top", scrub: true } });
+
+            // --- Magnetic Button Effect ---
+            const magneticWrap = document.querySelector('.magnetic-wrap');
+            const magneticBtn = document.querySelector('.magnetic-btn');
+            const magneticText = document.querySelector('.magnetic-text');
+            const magneticIcon = document.querySelector('.magnetic-icon');
+
+            if(magneticWrap && window.matchMedia("(hover: hover)").matches) {
+                magneticWrap.addEventListener('mousemove', (e) => {
+                    const bound = magneticWrap.getBoundingClientRect();
+                    const x = (e.clientX - bound.left - bound.width / 2);
+                    const y = (e.clientY - bound.top - bound.height / 2);
+                    gsap.to(magneticBtn, { x: x * 0.4, y: y * 0.4, duration: 0.6, ease: "power3.out" });
+                    gsap.to([magneticText, magneticIcon], { x: x * 0.2, y: y * 0.2, duration: 0.6, ease: "power3.out" });
+                });
+                magneticWrap.addEventListener('mouseleave', () => {
+                    gsap.to(magneticBtn, { x: 0, y: 0, duration: 1, ease: "elastic.out(1, 0.3)" });
+                    gsap.to([magneticText, magneticIcon], { x: 0, y: 0, duration: 1, ease: "elastic.out(1, 0.3)" });
+                });
+            }
+        }
+
+        // --- Modal & Audio Music ---
+        const music = document.getElementById('bg-music');
+        const visualizer = document.getElementById('music-visualizer');
+        const audioStatus = document.getElementById('audio-status');
+
+        function toggleMusic() {
+            initAudio(); 
+            if (music.paused) {
+                music.play().catch(e => console.log("Audio play failed:", e));
+                visualizer.classList.add('music-playing');
+                audioStatus.innerText = 'Denting: Mengalun';
+                audioStatus.classList.replace('text-zinc-300', 'text-accent');
+            } else {
+                music.pause();
+                visualizer.classList.remove('music-playing');
+                audioStatus.innerText = 'Denting: Hening';
+                audioStatus.classList.replace('text-accent', 'text-zinc-300');
+            }
+        }
+
+         // WA Modal
+        const waModal = document.getElementById('wa-modal');
+        
+        // --- LINK LAGU (BISA KAMU GANTI SENDIRI) ---
+        const mainMusicUrl = "teman1.mp3"; // Lagu halaman utama
+        const modalMusicUrl = "tulus.mp3"; // Lagu emosional saat masuk pop-up WA
+
+        function openWaModal() { 
+            waModal.classList.add('active'); 
+            if (typeof window.lenis !== 'undefined') window.lenis.stop(); 
+            
+            // --- EFEK GANTI LAGU & LANGSUNG PUTAR ---
+            initAudio(); // Pastikan sistem audio siap
+            music.src = modalMusicUrl; // Ganti sumber audio ke lagu kedua
+            music.play().then(() => {
+                // Ubah status indikator musik di pojok kanan atas jadi menyala
+                visualizer.classList.add('music-playing');
+                audioStatus.innerText = 'Denting: Mengalun';
+                audioStatus.classList.replace('text-zinc-300', 'text-accent');
+            }).catch(e => console.log("Audio play failed:", e));
+        }
+        
+        function closeWaModal() { 
+            waModal.classList.remove('active'); 
+            if (typeof window.lenis !== 'undefined') window.lenis.start(); 
+            // Memastikan scroll web utama menyala kembali dengan sempurna
+            document.documentElement.style.overflow = '';
+            
+            // --- KEMBALIKAN KE LAGU UTAMA ---
+            music.src = mainMusicUrl; 
+            music.play().catch(e => console.log("Audio play failed:", e));
+        }
+        
+        function sendToWa() {
+            const message = document.getElementById('wa-message').value;
+            window.open(`https://wa.me/${NOMOR_WA}?text=${encodeURIComponent(message)}`, '_blank');
+            closeWaModal();
+        }
+
+        // --- LETTER MODAL: CINEMATIC 3D REVEAL ---
+        const letterModal = document.getElementById('letter-modal');
+        let letterAnimTimeline = null;
+
+        function openLetterModal() { 
+            letterModal.classList.add('active'); 
+            if (typeof window.lenis !== 'undefined') window.lenis.stop(); 
+            
+            // --- EFEK GANTI LAGU KE LAGU SEDIH SAAT BUKA SURAT ---
+            initAudio(); 
+            music.src = modalMusicUrl; // Menggunakan tulus.mp3
+            music.play().then(() => {
+                visualizer.classList.add('music-playing');
+                audioStatus.innerText = 'Denting: Mengalun';
+                audioStatus.classList.replace('text-zinc-300', 'text-accent');
+            }).catch(e => console.log("Audio play failed:", e));
+
+            // GSAP 3D Unfold & Cinematic Blur Reveal
+            if (typeof gsap !== 'undefined') {
+                if(letterAnimTimeline) letterAnimTimeline.kill(); 
+
+                letterAnimTimeline = gsap.timeline();
+
+                // 1. Munculnya frame surat dengan putaran 3D
+                letterAnimTimeline.fromTo('.letter-content',
+                    { opacity: 0, rotationX: 15, y: 50, scale: 0.95 },
+                    { opacity: 1, rotationX: 0, y: 0, scale: 1, duration: 1.2, ease: "expo.out" }
+                );
+
+                // 2. Munculnya teks per-baris dari buram (blur) menjadi jelas
+                letterAnimTimeline.fromTo('.letter-anim',
+                    { opacity: 0, y: 40, filter: "blur(10px)" },
+                    { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.5, stagger: 0.15, ease: "power3.out" },
+                    "-=0.8" // Berjalan bersamaan sebelum animasi box selesai
+                );
+            }
+        }
+        
+        function closeLetterModal() { 
+            // --- KEMBALIKAN KE LAGU UTAMA SAAT SURAT DITUTUP ---
+            music.src = mainMusicUrl; // Kembali ke teman1.mp3
+            music.play().catch(e => console.log("Audio play failed:", e));
+
+            // Animasi mundur perlahan sebelum hilang
+            if (typeof gsap !== 'undefined') {
+                gsap.to('.letter-content', { opacity: 0, y: 30, duration: 0.5, ease: "power2.in" });
+                setTimeout(() => {
+                    letterModal.classList.remove('active'); 
+                    if (typeof window.lenis !== 'undefined') window.lenis.start(); 
+                    // Memastikan scroll web utama menyala kembali dengan sempurna
+                    document.documentElement.style.overflow = '';
+                }, 500);
+            } else {
+                letterModal.classList.remove('active'); 
+                if (typeof window.lenis !== 'undefined') window.lenis.start();
+                // Memastikan scroll web utama menyala kembali dengan sempurna
+                document.documentElement.style.overflow = '';
+            }
+        }
+
+        // --- Tombol Kembali ke Atas ---
+        const backToTopBtn = document.getElementById('back-to-top');
+        if (backToTopBtn) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > window.innerHeight * 0.5) {
+                    backToTopBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                    backToTopBtn.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+                } else {
+                    backToTopBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                    backToTopBtn.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+                }
+            });
+
+            backToTopBtn.addEventListener('click', () => {
+                if (typeof window.lenis !== 'undefined') {
+                    window.lenis.scrollTo(0, { duration: 2 });
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        }
+
+
+        // --- Ethereal Canvas (GSAP Ticker Optimized) ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.1;
+                this.speedX = (Math.random() * 0.5) - 0.25; this.speedY = (Math.random() * -0.5) - 0.1;
+                this.opacity = Math.random() * 0.5;
+                this.color = Math.random() > 0.3 ? `rgba(255, 90, 31, ${this.opacity})` : `rgba(200, 200, 200, ${this.opacity * 0.5})`;
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0; if (this.x < 0) this.x = canvas.width;
+                if (this.y < 0) this.y = canvas.height; 
+            }
+            draw() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color; ctx.fill();
+            }
+        }
+
+        function initCanvas() {
+            particlesArray = [];
+            for (let i = 0; i < (window.innerWidth < 768 ? 30 : 80); i++) particlesArray.push(new Particle());
+        }
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particlesArray.forEach(p => { p.update(); p.draw(); });
+        }
+        
+        initCanvas();
+        if (typeof gsap !== 'undefined') {
+            gsap.ticker.add(animateCanvas); 
+        } else {
+             function fallbackLoop() {
+                animateCanvas();
+                requestAnimationFrame(fallbackLoop);
+            }
+            fallbackLoop();
+        }
+    </script>
+</body>
+</html>
