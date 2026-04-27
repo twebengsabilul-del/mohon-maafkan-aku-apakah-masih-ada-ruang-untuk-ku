@@ -922,12 +922,12 @@
             if (music.paused) {
                 music.play().catch(e => console.log("Audio play failed:", e));
                 visualizer.classList.add('music-playing');
-                audioStatus.innerText = 'Denting: Mengalun';
+                audioStatus.innerText = 'bergema-selamanya';
                 audioStatus.classList.replace('text-zinc-300', 'text-accent');
             } else {
                 music.pause();
                 visualizer.classList.remove('music-playing');
-                audioStatus.innerText = 'Denting: Hening';
+                audioStatus.innerText = 'pause';
                 audioStatus.classList.replace('text-accent', 'text-zinc-300');
             }
         }
