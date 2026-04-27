@@ -1,1 +1,0 @@
-# mohon-maafkan-aku-apakah-masih-ada-ruang-untuk-ku
